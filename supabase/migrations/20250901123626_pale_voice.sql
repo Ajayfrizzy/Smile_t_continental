@@ -208,34 +208,34 @@ CREATE POLICY "Barman can create sales"
     )
   );
 
--- Gallery table for hotel images
-CREATE TABLE IF NOT EXISTS gallery (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ Gallery table for hotel images
+ CREATE TABLE IF NOT EXISTS gallery (
+   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
-  description text NOT NULL,
+   description text NOT NULL,
   image_url text NOT NULL,
-  category text NOT NULL DEFAULT 'general' CHECK (category IN ('rooms', 'facilities', 'exterior', 'restaurant', 'events')),
-  is_featured boolean DEFAULT false,
+ category text NOT NULL DEFAULT 'general' CHECK (category IN ('rooms', 'facilities', 'exterior', 'restaurant', 'events')),
+   is_featured boolean DEFAULT false,
   created_at timestamptz DEFAULT now()
-);
+); 
 
-ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
+ ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
 
 -- Gallery policies
-CREATE POLICY "Anyone can view gallery"
-  ON gallery
-  FOR SELECT
+ CREATE POLICY "Anyone can view gallery"
+   ON gallery
+   FOR SELECT
   TO authenticated, anon
-  USING (true);
+   USING (true);
 
-CREATE POLICY "Super admin can manage gallery"
-  ON gallery
-  FOR ALL
-  TO authenticated
-  USING (
+ CREATE POLICY "Super admin can manage gallery"
+   ON gallery
+   FOR ALL
+   TO authenticated
+   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() AND role = 'super_admin'
+       SELECT 1 FROM profiles 
+       WHERE id = auth.uid() AND role = 'super_admin'
     )
   );
 
