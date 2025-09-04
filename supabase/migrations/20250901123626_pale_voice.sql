@@ -208,66 +208,7 @@ CREATE POLICY "Barman can create sales"
     )
   );
 
- Gallery table for hotel images
- CREATE TABLE IF NOT EXISTS gallery (
-   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  title text NOT NULL,
-   description text NOT NULL,
-  image_url text NOT NULL,
- category text NOT NULL DEFAULT 'general' CHECK (category IN ('rooms', 'facilities', 'exterior', 'restaurant', 'events')),
-   is_featured boolean DEFAULT false,
-  created_at timestamptz DEFAULT now()
-); 
 
- ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
-
--- Gallery policies
- CREATE POLICY "Anyone can view gallery"
-   ON gallery
-   FOR SELECT
-  TO authenticated, anon
-   USING (true);
-
- CREATE POLICY "Super admin can manage gallery"
-   ON gallery
-   FOR ALL
-   TO authenticated
-   USING (
-    EXISTS (
-       SELECT 1 FROM profiles 
-       WHERE id = auth.uid() AND role = 'super_admin'
-    )
-  );
-
--- Social media table
-CREATE TABLE IF NOT EXISTS social_media (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  platform text NOT NULL CHECK (platform IN ('facebook', 'instagram', 'twitter', 'linkedin', 'youtube')),
-  url text NOT NULL,
-  handle text NOT NULL,
-  is_active boolean DEFAULT true,
-  created_at timestamptz DEFAULT now()
-);
-
-ALTER TABLE social_media ENABLE ROW LEVEL SECURITY;
-
--- Social media policies
-CREATE POLICY "Anyone can view social media"
-  ON social_media
-  FOR SELECT
-  TO authenticated, anon
-  USING (is_active = true);
-
-CREATE POLICY "Super admin can manage social media"
-  ON social_media
-  FOR ALL
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() AND role = 'super_admin'
-    )
-  );
 
 -- Insert sample data
 
@@ -277,23 +218,6 @@ INSERT INTO rooms (name, description, price, max_guests, amenities, images, room
 ('Executive Room', 'Spacious room perfect for business travelers', 320.00, 2, '["Queen Bed", "Work Desk", "WiFi", "Air Conditioning", "Coffee Machine"]', '["https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg"]', 'EX002'),
 ('Standard Room', 'Comfortable room with all essential amenities', 180.00, 2, '["Double Bed", "WiFi", "Air Conditioning", "TV"]', '["https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg"]', 'ST003'),
 ('Family Suite', 'Perfect for families with connecting rooms', 550.00, 4, '["Two Queen Beds", "Living Area", "Kitchenette", "WiFi", "Air Conditioning"]', '["https://images.pexels.com/photos/1134176/pexels-photo-1134176.jpeg"]', 'FS004');
-
--- Sample gallery items
-INSERT INTO gallery (title, description, image_url, category, is_featured) VALUES
-('Luxury Suite Interior', 'Elegant and spacious luxury suite with modern furnishing', 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg', 'rooms', true),
-('Hotel Exterior Night', 'Beautiful exterior view of Hotel Grandeur at night', 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg', 'exterior', true),
-('Fine Dining Restaurant', 'Exquisite dining experience with panoramic views', 'https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg', 'restaurant', true),
-('Rooftop Pool', 'Infinity pool with stunning city skyline views', 'https://images.pexels.com/photos/271694/pexels-photo-271694.jpeg', 'facilities', true),
-('Spa & Wellness Center', 'Relaxing spa treatments and wellness facilities', 'https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg', 'facilities', false),
-('Wedding Venue', 'Perfect setting for weddings and special events', 'https://images.pexels.com/photos/1579253/pexels-photo-1579253.jpeg', 'events', false);
-
--- Sample social media links
-INSERT INTO social_media (platform, url, handle, is_active) VALUES
-('instagram', 'https://instagram.com/hotelgrandeur', '@hotelgrandeur', true),
-('facebook', 'https://facebook.com/hotelgrandeur', 'Hotel Grandeur', true),
-('twitter', 'https://twitter.com/grandeurhotel', '@grandeurhotel', true),
-('linkedin', 'https://linkedin.com/company/hotelgrandeur', 'Hotel Grandeur', true),
-('youtube', 'https://youtube.com/hotelgrandeur', 'Hotel Grandeur', true);
 
 -- Sample drinks inventory
 INSERT INTO drinks (name, price, stock_quantity, category, image_url) VALUES
